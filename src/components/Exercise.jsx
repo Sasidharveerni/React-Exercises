@@ -77,6 +77,10 @@ function Exercise() {
         );
     };
 
+    const FilteringSearchBar = () => {
+        
+    }
+
     return (
         <div>
             <Counter />
