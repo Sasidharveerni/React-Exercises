@@ -1,4 +1,5 @@
-import React, { createContext, useEffect, useReducer, useState } from 'react';
+import React, { createContext, useEffect, useReducer, useRef, useState } from 'react';
+import { FixedSizeList as List } from 'react-window';
 
 // Theme Context (Declared Outside)
 const ThemeContext = createContext('light');
@@ -82,28 +83,34 @@ function Exercise() {
   const [results, setResults] = useState([]);
   const debouncedQuery = useDebounce(query, 500); // Debounce API calls
 
-//   useEffect(() => {
-//     if (debouncedQuery) {
-//       fetch(`https://dummyjson.com/products/search?q=${debouncedQuery}`)
-//         .then((res) => res.json())
-//         .then((data) => setResults(data.products))
-//         .catch((error) => console.error("Error fetching data:", error));
-//     } else {
-//       setResults([]);
-//     }
-//   }, [debouncedQuery]);
+  const counter = useRef(0);
 
   useEffect(() => {
-    let counter = 0;
-    fetch(`https://dummyjson.com/products/search?q=${query}`)
-    .then(res => res.json())
-    .then(res => {
-        counter+= 1;
-        setResults(res.products);
-        console.log("API called: ", counter + "times")
+    if (debouncedQuery) {
+      fetch(`https://dummyjson.com/products/search?q=${debouncedQuery}`)
+        .then((res) => res.json())
+        .then((data) => {
+            counter.current += 1;
+            console.log("API called: ", counter.current + "times")
+            setResults(data.products);
     })
-    .catch((err) => console.log(err))
-  }, [query])
+        .catch((error) => console.error("Error fetching data:", error));
+    } else {
+      setResults([]);
+    }
+  }, [debouncedQuery]);
+
+ 
+//   useEffect(() => {
+//     fetch(`https://dummyjson.com/products/search?q=${query}`)
+//     .then(res => res.json())
+//     .then(res => {
+//         counter.current += 1;
+//         setResults(res.products);
+//         console.log("API called: ", counter.current + "times")
+//     })
+//     .catch((err) => console.log(err))
+//   }, [query])
 
   return (
     <div>
@@ -122,12 +129,35 @@ function Exercise() {
   );
     }
 
+
+
+    const VirtualizedList = () => {
+        const itemCount = 10000; // Large list of 10,000 items
+
+const Row = ({ index, style }) => (
+  <div style={{ ...style, padding: "10px", borderBottom: "1px solid #ddd" }}>
+    Item {index + 1}
+  </div>
+);
+     return (
+        <List
+      height={500} // Height of the visible window
+      itemCount={itemCount} // Total number of items
+      itemSize={35} // Height of each row
+      width={"100%"} // Full width
+    >
+      {Row}
+    </List>
+     )
+    }
+
     return (
         <div>
             <Counter />
             <Debouncing />
             <ThemeSwitching />
             <FilteringSearchBar />
+            <VirtualizedList />
         </div>
     );
 }
