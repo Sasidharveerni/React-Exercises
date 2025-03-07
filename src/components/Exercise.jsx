@@ -78,7 +78,48 @@ function Exercise() {
     };
 
     const FilteringSearchBar = () => {
-        
+        const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const debouncedQuery = useDebounce(query, 500); // Debounce API calls
+
+//   useEffect(() => {
+//     if (debouncedQuery) {
+//       fetch(`https://dummyjson.com/products/search?q=${debouncedQuery}`)
+//         .then((res) => res.json())
+//         .then((data) => setResults(data.products))
+//         .catch((error) => console.error("Error fetching data:", error));
+//     } else {
+//       setResults([]);
+//     }
+//   }, [debouncedQuery]);
+
+  useEffect(() => {
+    let counter = 0;
+    fetch(`https://dummyjson.com/products/search?q=${query}`)
+    .then(res => res.json())
+    .then(res => {
+        counter+= 1;
+        setResults(res.products);
+        console.log("API called: ", counter + "times")
+    })
+    .catch((err) => console.log(err))
+  }, [query])
+
+  return (
+    <div>
+      <input
+        type="text"
+        placeholder="Search products..."
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+      <ul>
+        {results.map((item) => (
+          <li key={item.id}>{item.title}</li>
+        ))}
+      </ul>
+    </div>
+  );
     }
 
     return (
@@ -86,6 +127,7 @@ function Exercise() {
             <Counter />
             <Debouncing />
             <ThemeSwitching />
+            <FilteringSearchBar />
         </div>
     );
 }
