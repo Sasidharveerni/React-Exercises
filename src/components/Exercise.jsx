@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useReducer, useRef, useState, lazy, Suspense } from 'react';
+import React, { createContext, useEffect, useReducer, useRef, useState, lazy, Suspense, memo } from 'react';
 import { FixedSizeList as List } from 'react-window';
 
 // Theme Context (Declared Outside)
@@ -29,6 +29,7 @@ function Exercise() {
                 <div>
                     <button onClick={() => dispatch({ type: 'Reset' })}>Reset</button>
                 </div>
+                <ReactMemo count = {Counter} />
             </div>
         );
     };
@@ -151,23 +152,22 @@ const Row = ({ index, style }) => (
      )
     }
 
-    const ReactMemo = () => {
-      const [count, setCount] = useState(0);
-
+    const ReactMemo = memo(function ReactMemo({count}) {
       return (
-        <>
         <div>
-          <h4>{count}</h4>
-          <button onClick={() => setCount((prev) => prev + 1)}>Increment</button>
+          <h3>{count}</h3>
         </div>
-        </>
       )
-    }
+      
+    })
+
+   
 
 
 
     return (
         <div>
+          
             <Counter />
             <Debouncing />
             <ThemeSwitching />
